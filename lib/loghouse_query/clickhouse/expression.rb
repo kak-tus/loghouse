@@ -49,7 +49,9 @@ class LoghouseQuery
         when '!~'
           "not(#{string_regex})"
         when '=', '!='
-          if (value.is_a?(String) || label_key?)
+          if (key == 'phone')
+            number_comparison
+          elsif (value.is_a?(String) || label_key?)
             equation_string
           else
             equation_all
@@ -69,7 +71,9 @@ class LoghouseQuery
       end
 
       def number_comparison
-        if any_key?
+        if (key == 'phone')
+          "#{key} #{operator} #{value}"
+        elsif any_key?
           "arrayExists(x -> x #{operator} #{value}, number_fields.values)"
         else
           "has(number_fields.names, '#{key}') AND "\
