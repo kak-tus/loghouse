@@ -13,7 +13,11 @@ module LogsTables
     host: 'String',
     pod_name: 'String',
     container_name: 'String',
-    stream: 'String'
+    stream: 'String',
+    phone: 'UInt64',
+    request_id: 'String',
+    order_id: 'String',
+    subscription_id: 'String'
   }.freeze
 
   module_function
