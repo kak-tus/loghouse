@@ -8,12 +8,12 @@ module LogsTables
   raise "24 must be divisible by PARTITION_PERIOD" unless (24 % PARTITION_PERIOD).zero?
 
   KUBERNETES_ATTRIBUTES = {
-    source: 'String',
-    namespace: 'String',
+    level: 'String',
+    tag: 'String',
     host: 'String',
-    pod_name: 'String',
-    container_name: 'String',
-    stream: 'String',
+    pid: 'String',
+    caller: 'String',
+    msg: 'String',
     phone: 'UInt64',
     request_id: 'String',
     order_id: 'String',
