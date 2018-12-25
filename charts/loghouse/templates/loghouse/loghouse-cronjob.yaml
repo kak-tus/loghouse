@@ -1,8 +1,8 @@
-apiVersion: batch/v2alpha1
+apiVersion: {{ template "CronJob.apiVersion" $ }}
 kind: CronJob
 metadata:
   name: {{ .Chart.Name }}-tables
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
 spec:
   schedule: "59 23 * * *"
   concurrencyPolicy: Forbid
@@ -16,10 +16,10 @@ spec:
           initContainers:
           - name: wait-clickhouse
             image: alpine:3.6
-            command: ['/bin/sh', '-c', 'while ! getent ahostsv4 clickhouse; do sleep 1; done']
+            command: [ '/bin/sh', '-c', 'while ! nc -z clickhouse 8123; do sleep 1; done' ]
           containers:
             - name: cron
-              image: flant/loghouse-dashboard:{{ .Chart.Version }}
+              image: flant/loghouse-dashboard:{{ template "app.version" $ }}
               imagePullPolicy: {{ .Values.imagePullPolicy }}
               command: ['/bin/bash', '-l', '-c', 'rake create_logs_tables']
               env:

@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: fluentd
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     k8s-app: fluentd
     kubernetes.io/cluster-service: "true"
@@ -19,7 +19,7 @@ spec:
       serviceAccountName: fluentd
       containers:
       - name: fluentd
-        image: flant/loghouse-fluentd:{{ .Chart.Version }}
+        image: flant/loghouse-fluentd:{{ template "app.version" $ }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         env:
         - name: FLUENTD_ARGS
@@ -36,6 +36,10 @@ spec:
           value: {{ .Values.clickhouse.db | quote }}
         - name: K8S_LOGS_TABLE
           value: {{ .Values.clickhouse.table | quote }}
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
         resources:
           limits:
             memory: {{ .Values.fluentd.resources.limits.memory }}

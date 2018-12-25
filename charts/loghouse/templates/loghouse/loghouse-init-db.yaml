@@ -2,12 +2,12 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ .Chart.Name }}-init-db
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": post-install
     "helm.sh/weight": "-5"
 spec:
-  activeDeadlineSeconds: 300
+  activeDeadlineSeconds: 600
   template:
     metadata:
       name: {{ .Chart.Name }}-init-db
@@ -16,10 +16,10 @@ spec:
       initContainers:
       - name: wait-clickhouse
         image: alpine:3.6
-        command: [ '/bin/sh', '-c', 'while ! getent ahostsv4 clickhouse; do sleep 1; done' ]
+        command: [ '/bin/sh', '-c', 'while ! nc -z clickhouse 8123; do sleep 1; done' ]
       containers:
       - name: init
-        image: flant/loghouse-fluentd:{{ .Chart.Version }}
+        image: flant/loghouse-fluentd:{{ template "app.version" $ }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         command: ['/bin/bash', '-l', '-c', 'clickhouse-client --host=${CLICKHOUSE_URL} --port=9000 --user=${CLICKHOUSE_USERNAME} --password=${CLICKHOUSE_PASSWORD} --query="CREATE DATABASE ${CLICKHOUSE_DATABASE};"']
         env:
